@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="form_hr_attendance_views_inherit" model="ir.ui.view">
+        <field name="name">form.hr.attendance.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='overtime_hours']" position="after">
+                <field name="late_minutes" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="name">Attendance</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">gantt,list,form,pivot,graph</field>
+    </record>
+
+    <record id="view_hr_attendance_pivot_inherit" model="ir.ui.view">
+        <field name="name">hr.attendance.pivot.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <pivot string="Attendance Analysis">
+                <field name="employee_id" type="row"/>
+                <field name="check_in" interval="month" type="col"/>
+                <field name="late_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+</odoo>

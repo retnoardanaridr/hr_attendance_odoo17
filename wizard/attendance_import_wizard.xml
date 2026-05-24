@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_attendance_import_wizard_inherit_form" model="ir.ui.view">
+        <field name="name">attendance.import.wizard</field>
+        <field name="model">attendance.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Attendance">
+                <group>
+                    <field name="import_file_att" filename="filename_att" />
+                    <field name="filename_att" invisible="1" />
+                </group>
+                <footer>
+                    <button name="action_import" string="Import" type="object" class="btn-primary" />
+                    <button string="Cancel" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- action -->
+    <record id="attendance_import_wizard_inherit_action" model="ir.actions.act_window">
+        <field name="name">Import Attendance</field>
+        <field name="res_model">attendance.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_attendance_import"
+        name="Import Attendance"
+        parent="hr_attendance.menu_hr_attendance_root"
+        action="attendance_import_wizard_inherit_action"
+        sequence="99"/>
+</odoo>
