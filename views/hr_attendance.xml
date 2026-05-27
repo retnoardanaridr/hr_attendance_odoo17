@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='overtime_hours']" position="after">
                 <field name="late_minutes" />
+                <field name="is_incomplete" />
             </xpath>
         </field>
     </record>

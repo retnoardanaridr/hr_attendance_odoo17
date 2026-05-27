@@ -11,8 +11,8 @@
         'hr_attendance',
         ],
     'data' : [
-        'views/hr_employee.xml',
         'views/hr_attendance.xml',
+        'views/hr_leave_type_views.xml',
         'security/ir.model.access.csv',
         'wizard/attendance_import_wizard.xml',
     ],

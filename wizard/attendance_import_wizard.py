@@ -52,7 +52,7 @@ class AttendanceImportWizard(models.TransientModel):
             
         for (employee_code, date_key), times in attendance_data.items():
             employee = self.env['hr.employee'].search([
-                ('fingerprint_code', '=', str(employee_code))
+                ('barcode', '=', str(employee_code))
             ], limit=1)
             
             if not employee:
@@ -67,10 +67,12 @@ class AttendanceImportWizard(models.TransientModel):
             attendance = calendar.attendance_ids.filtered(
                 lambda a: a.dayofweek == weekday
             )[:1]
+            if not attendance:
+                continue
             
             hour = int(attendance.hour_from)
             minute = int((attendance.hour_from % 1) * 60)
-            # ada beberapa karyawan yang masuk sabtu hanya 2x 
+            
             work_start = datetime.combine(
                 local_time_in.date(),
                 time(hour, minute)
@@ -83,17 +85,44 @@ class AttendanceImportWizard(models.TransientModel):
             else:
                 late_minutes=0
                 
+            is_incomplete = False
+            
             check_in = local_time_in - timedelta(hours=7)
             check_out = local_time_out - timedelta(hours=7)
             
             if check_in == check_out:
+                is_incomplete = True
+                
+            existing_attendance = self.env['hr.attendance'].search([
+                ('employee_id', '=', employee.id),
+                ('check_in', '>=', datetime.combine(date_key, time.min)),
+            ], limit=1)
+            
+            if existing_attendance:
                 continue
             
+            attendance_status = 'present'
+            if late_minutes > 0:
+                leave = self.env['hr.leave'].search([
+                    ('employee_id', '=', employee.id),
+                    ('state', '=', 'validate'),
+                    ('holiday_status_id.is_late_permission', '=', True),
+                    ('request_date_from', '<=', date_key),
+                    ('request_date_to', '>=', date_key),
+                ], limit=1)
+            
+                if leave:
+                    attendance_status = 'excused_late'
+                else:
+                    attendance_status = 'late'
+                
             self.env['hr.attendance'].create({
                 'employee_id': employee.id,
                 'check_in': check_in,
                 'check_out': check_out,
-                'late_minutes': late_minutes,
+                'late_minutes': round(late_minutes, 2),
+                'is_incomplete' : is_incomplete,
+                'attendance_status': attendance_status,
             })
             
             
